@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Phone Control</string>
+    <string name="a11y_description">Lets the AI apps you connect see the screen and tap, swipe and type for you. It only acts while the server switch in Phone Control is on, and never inside banking or payment apps.</string>
+</resources>

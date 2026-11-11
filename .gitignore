@@ -1,0 +1,30 @@
+# secrets and personal logs
+config.json
+actions.log
+*.log
+.env
+.phonecontrol_secret
+local.properties
+
+# android / gradle
+.gradle/
+build/
+*.apk
+*.aab
+*.keystore
+*.jks
+captures/
+.idea/
+
+# ad project
+node_modules/
+out/
+ad/public/demo_raw.mp4
+ad/public/bgm.wav
+ad/src/events.json
+*.tsbuildinfo
+
+# python
+__pycache__/
+*.pyc
+.venv/

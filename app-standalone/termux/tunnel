@@ -1,0 +1,41 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Gives the Phone Control app (port 8765 on this phone) a public https address.
+# Install: copy to $PREFIX/bin/tunnel in Termux, chmod +x, then type: tunnel
+# The address is new every time. It works only while this keeps running.
+
+LOG="$HOME/tunnel.log"
+SECRET_FILE="$HOME/.phonecontrol_secret"   # the secret part of the address shown in Phone Control
+
+termux-wake-lock 2>/dev/null
+: > "$LOG"
+rm -f "$HOME/tunnel.url"
+echo "Starting the tunnel..."
+cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8765 > "$LOG" 2>&1 &
+PID=$!
+trap 'kill $PID 2>/dev/null; termux-wake-unlock 2>/dev/null; rm -f "$HOME/tunnel.url"' EXIT
+
+URL=""
+for i in $(seq 1 60); do
+  URL=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' "$LOG" | head -1)
+  [ -n "$URL" ] && break
+  kill -0 $PID 2>/dev/null || break
+  sleep 1
+done
+if [ -z "$URL" ]; then
+  echo "The tunnel did not start. Last lines of $LOG:"
+  tail -5 "$LOG"
+  exit 1
+fi
+echo "$URL" > "$HOME/tunnel.url"
+
+echo
+echo "Address for Claude / ChatGPT (new on every start):"
+echo
+if [ -s "$SECRET_FILE" ]; then
+  echo "$URL/$(cat "$SECRET_FILE")/mcp"
+else
+  echo "$URL/<secret from Phone Control>/mcp"
+fi
+echo
+echo "Keep Termux running. Ctrl+C here stops the tunnel."
+wait $PID
